@@ -40,8 +40,26 @@
             </button>
           </div>
           
-          <!-- Share button (right aligned) -->
+          <!-- Share button and dev tools (right aligned) -->
           <div class="header-actions" v-if="currentArticle">
+            <!-- Developer mode article selector -->
+            <div class="dev-selector" v-if="isDeveloperMode">
+              <select 
+                @change="selectArticle" 
+                :value="currentDayNumber - 1"
+                class="article-selector"
+                title="Select article (Dev Mode)"
+              >
+                <option 
+                  v-for="(article, index) in articles" 
+                  :key="index" 
+                  :value="index"
+                >
+                  {{ index + 1 }}. {{ article.title }}
+                </option>
+              </select>
+            </div>
+            
             <button 
               @click="shareArticle" 
               class="share-button"
@@ -335,6 +353,24 @@ const goToToday = () => {
   scrollToTop()
 }
 
+// Developer mode: Select article by index
+const selectArticle = (event) => {
+  if (!isDeveloperMode) return
+  
+  const articleIndex = parseInt(event.target.value)
+  
+  // Calculate the date for this article index
+  // Start from START_DATE and add weekdays to reach the desired article
+  let targetDate = new Date(START_DATE)
+  
+  for (let i = 0; i < articleIndex; i++) {
+    targetDate = getNextWeekday(targetDate)
+  }
+  
+  currentDate.value = targetDate
+  scrollToTop()
+}
+
 // Share functionality
 const shareArticle = async () => {
   if (!currentArticle.value) return
@@ -561,6 +597,44 @@ onUnmounted(() => {
   background: linear-gradient(135deg, #7c3aed, #db2777);
   transform: translateY(-2px);
   box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
+}
+
+.dev-selector {
+  margin-right: 1rem;
+}
+
+.article-selector {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #e5e7eb;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.article-selector:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.article-selector:focus {
+  outline: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #60a5fa;
+  box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+}
+
+.article-selector option {
+  background: #1a1a1a;
+  color: #e5e7eb;
+  padding: 0.5rem;
 }
 
 .nav-button {
@@ -801,8 +875,40 @@ onUnmounted(() => {
   background: rgba(255, 255, 255, 0.1);
   padding: 0.125rem 0.375rem;
   border-radius: 0.25rem;
-  font-family: 'Fira Code', Consolas, monospace;
+  font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
   font-size: 0.9em;
+  color: #fbbf24;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.article-content :deep(pre) {
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  overflow-x: auto;
+  font-family: 'Fira Code', 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #e5e7eb;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.article-content :deep(pre code) {
+  background: none;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  font-size: inherit;
+  color: inherit;
+  display: block;
+}
+
+/* Syntax highlighting for common keywords */
+.article-content :deep(pre code) {
+  white-space: pre;
+  word-wrap: normal;
 }
 
 .article-content :deep(blockquote) {
@@ -839,6 +945,19 @@ onUnmounted(() => {
     font-size: 1rem;
   }
   
+  /* Mobile code block styles */
+  .article-content :deep(pre) {
+    padding: 1rem;
+    margin: 1.5rem 0;
+    font-size: 0.8rem;
+    border-radius: 0.375rem;
+  }
+  
+  .article-content :deep(code) {
+    font-size: 0.85em;
+    padding: 0.1rem 0.3rem;
+  }
+  
   .date-info {
     flex-direction: column;
     align-items: flex-start;
@@ -870,6 +989,16 @@ onUnmounted(() => {
   .share-button {
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
+  }
+  
+  .dev-selector {
+    margin-right: 0.5rem;
+  }
+  
+  .article-selector {
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+    max-width: 200px;
   }
   
   .nav-button {
