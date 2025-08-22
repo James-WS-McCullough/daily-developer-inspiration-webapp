@@ -62,6 +62,30 @@
         </article>
       </div>
     </main>
+    
+    <footer class="footer">
+      <div class="container">
+        <div class="footer-content">
+          <p class="attribution">
+            📖 Articles sourced from 
+            <strong>"97 Things Every Programmer Should Know"</strong>
+          </p>
+          <p class="purchase-link">
+            <a 
+              href="https://www.oreilly.com/library/view/97-things-every/9780596809515/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              class="book-link"
+            >
+              📚 Get the full book from O'Reilly
+            </a>
+          </p>
+          <p class="credit">
+            Full credit to the original authors and contributors
+          </p>
+        </div>
+      </div>
+    </footer>
   </div>
 </template>
 
@@ -458,6 +482,59 @@ onUnmounted(() => {
   font-style: italic;
 }
 
+/* Footer Styles */
+.footer {
+  background: rgba(0, 0, 0, 0.3);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 4rem;
+}
+
+.footer-content {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.attribution {
+  font-size: 1rem;
+  color: #e5e7eb;
+  margin-bottom: 0.5rem;
+}
+
+.attribution strong {
+  color: #60a5fa;
+  font-weight: 600;
+}
+
+.purchase-link {
+  margin: 1rem 0;
+}
+
+.book-link {
+  display: inline-block;
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+  color: white;
+  text-decoration: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.book-link:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 15px -3px rgba(0, 0, 0, 0.2);
+}
+
+.credit {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  font-style: italic;
+  margin-top: 0.5rem;
+}
+
 .article {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -595,6 +672,28 @@ onUnmounted(() => {
   
   .no-articles-title {
     font-size: 2rem;
+  }
+  
+  .footer-content {
+    text-align: center;
+    padding: 1rem 0;
+  }
+  
+  .attribution {
+    font-size: 0.9rem;
+  }
+  
+  .purchase-link {
+    margin: 0.5rem 0;
+  }
+  
+  .book-link {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .credit {
+    font-size: 0.8rem;
   }
 }
 </style>
