@@ -75,6 +75,7 @@
           <div class="article-header">
             <h2 class="article-title">{{ currentArticle.title }}</h2>
             <p class="article-author">by {{ currentArticle.author }}</p>
+            <p class="article-reading-time">{{ estimatedReadingTime }}</p>
           </div>
           
           <div class="article-content" v-html="renderedContent"></div>
@@ -281,6 +282,24 @@ const renderedContent = computed(() => {
   })
   
   return marked(currentArticle.value.content)
+})
+
+const estimatedReadingTime = computed(() => {
+  if (!currentArticle.value) return ''
+  
+  // Count words in the content (simple word count by splitting on whitespace)
+  const words = currentArticle.value.content.trim().split(/\s+/).length
+  
+  // Average reading speed is about 200 words per minute
+  const averageWordsPerMinute = 200
+  const minutes = Math.ceil(words / averageWordsPerMinute)
+  
+  // Return formatted string
+  if (minutes === 1) {
+    return '1 minute read'
+  } else {
+    return `${minutes} minute read`
+  }
 })
 
 const formatDate = (date) => {
@@ -699,6 +718,20 @@ onUnmounted(() => {
   font-size: 1rem;
   color: #9ca3af;
   font-style: italic;
+}
+
+.article-reading-time {
+  font-size: 0.875rem;
+  color: #6b7280;
+  font-weight: 500;
+  margin-top: 0.5rem;
+  display: flex;
+  align-items: center;
+}
+
+.article-reading-time::before {
+  content: '⏳';
+  margin-right: 0.5rem;
 }
 
 .article-content {
