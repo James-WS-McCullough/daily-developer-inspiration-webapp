@@ -402,7 +402,7 @@ const handleScroll = () => {
   const currentScrollY = window.scrollY
   
   // Use different thresholds for scrolling down vs up to prevent jittery behavior
-  const SCROLL_DOWN_THRESHOLD = 110
+  const SCROLL_DOWN_THRESHOLD = 200
   const SCROLL_UP_THRESHOLD = 50
   
   if (currentScrollY > lastScrollY.value) {
@@ -845,18 +845,26 @@ onUnmounted(() => {
   }
   
   .header-controls {
-    flex-direction: column;
-    gap: 0.75rem;
-    align-items: stretch;
+    flex-direction: row;
+    gap: 0.5rem;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  /* Add spacing for collapsed header on mobile */
+  .header-minimized .header-controls {
+    margin-top: 1rem;
   }
   
   .header-navigation {
-    justify-content: center;
-    gap: 0.5rem;
+    justify-content: flex-start;
+    gap: 0.25rem;
+    flex: 1;
   }
   
   .header-actions {
-    justify-content: center;
+    justify-content: flex-end;
+    flex-shrink: 0;
   }
   
   .share-button {
