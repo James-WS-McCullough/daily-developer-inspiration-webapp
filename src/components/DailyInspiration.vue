@@ -5,18 +5,18 @@
         <h1 class="title">📚 Daily Developer Wisdom</h1>
         <div class="date-info" v-show="!isScrolled || !isMobile">
           <span class="current-date">{{ formatDate(currentDate) }}</span>
-          <span class="day-counter" v-if="isDeveloperMode">Day {{ weekdayIndex + 1 }} of {{ totalArticles }}</span>
+          <span class="day-counter" v-if="isDeveloperMode">Day {{ currentDayNumber }} of {{ totalArticles }}</span>
         </div>
         
         <!-- Navigation moved to header -->
         <div class="header-navigation" v-if="hasArticlesAvailable">
           <button 
             @click="goToPreviousDay" 
-            :disabled="weekdayIndex === 0"
+            :disabled="!canGoToPreviousDay"
             class="nav-button prev"
             title="Previous Day"
           >
-            Previous
+            {{ previousButtonText }}
           </button>
           
           <button @click="goToToday" class="nav-button today" title="Today">
@@ -71,8 +71,8 @@ import { marked } from 'marked'
 import articlesData from '../data/articles.json'
 
 // Configuration
-const START_DATE = new Date('2025-09-01') // Articles start date
-const isDeveloperMode = import.meta.env.DEV // Enable developer features in development
+const START_DATE = new Date('2025-09-01') // Articles start date //2025-09-01
+const isDeveloperMode =  import.meta.env.DEV // Enable developer features in development
 
 const articles = articlesData.inspiration
 const totalArticles = articles.length
@@ -80,48 +80,108 @@ const currentDate = ref(new Date())
 const isScrolled = ref(false)
 const isMobile = ref(false)
 
-// Calculate weekdays only since start date
-const getWeekdaysSinceStart = () => {
-  const today = new Date()
-  let current = new Date(START_DATE)
-  let weekdays = 0
+// Helper function to check if a date is a weekday
+const isWeekday = (date) => {
+  const day = date.getDay()
+  return day >= 1 && day <= 5 // Monday = 1, Friday = 5
+}
+
+// Calculate weekdays between two dates
+const getWeekdaysBetween = (startDate, endDate) => {
+  let count = 0
+  let current = new Date(startDate)
   
-  while (current <= today) {
-    const dayOfWeek = current.getDay()
-    // Monday = 1, Tuesday = 2, ..., Friday = 5
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      weekdays++
+  while (current <= endDate) {
+    if (isWeekday(current)) {
+      count++
     }
     current.setDate(current.getDate() + 1)
   }
   
-  return Math.max(0, weekdays - 1) // Subtract 1 since we want 0-based indexing
+  return count
 }
 
-const weekdayIndex = ref(getWeekdaysSinceStart() % totalArticles)
+// Get the article index for a given date
+const getArticleIndexForDate = (date) => {
+  if (date < START_DATE) return null
+  
+  const weekdaysSinceStart = getWeekdaysBetween(START_DATE, date) - 1 // 0-based
+  return weekdaysSinceStart % totalArticles
+}
 
 const hasArticlesAvailable = computed(() => {
-  const today = new Date()
-  const startDate = new Date(START_DATE)
-  return today >= startDate || isDeveloperMode
+  return currentDate.value >= START_DATE || isDeveloperMode
 })
 
 const currentArticle = computed(() => {
   if (!hasArticlesAvailable.value) return null
-  return articles[weekdayIndex.value]
+  const articleIndex = getArticleIndexForDate(currentDate.value)
+  return articleIndex !== null ? articles[articleIndex] : null
+})
+
+const currentDayNumber = computed(() => {
+  const articleIndex = getArticleIndexForDate(currentDate.value)
+  return articleIndex !== null ? articleIndex + 1 : 0
+})
+
+const previousButtonText = computed(() => {
+  if (isDeveloperMode) {
+    return 'Previous'
+  } else {
+    const prevDate = getPreviousWeekday(currentDate.value)
+    const today = new Date()
+    const twoWeeksAgo = new Date(today)
+    twoWeeksAgo.setDate(today.getDate() - 14)
+    
+    // Check if we're at the 2-week limit or start date limit
+    if (prevDate < START_DATE || prevDate < twoWeeksAgo) {
+      return 'Too Old'
+    }
+    return 'Previous'
+  }
 })
 
 const canGoToNextDay = computed(() => {
-  const todayIndex = getWeekdaysSinceStart() % totalArticles
-  
   if (isDeveloperMode) {
-    // In dev mode, can go to any article
-    return weekdayIndex.value < totalArticles - 1
+    return true // In dev mode, can always navigate
   } else {
-    // In production, can only go up to today's article
-    return weekdayIndex.value < todayIndex
+    // In production, can only go up to today
+    const today = new Date()
+    const nextDate = getNextWeekday(currentDate.value)
+    return nextDate <= today
   }
 })
+
+const canGoToPreviousDay = computed(() => {
+  if (isDeveloperMode) {
+    return currentDate.value > START_DATE
+  } else {
+    // Can go back to previous weekday, but not before start date or more than 2 weeks back
+    const prevDate = getPreviousWeekday(currentDate.value)
+    const today = new Date()
+    const twoWeeksAgo = new Date(today)
+    twoWeeksAgo.setDate(today.getDate() - 14)
+    
+    return prevDate >= START_DATE && prevDate >= twoWeeksAgo
+  }
+})
+
+// Helper functions to get next/previous weekdays
+const getNextWeekday = (date) => {
+  const next = new Date(date)
+  do {
+    next.setDate(next.getDate() + 1)
+  } while (!isWeekday(next))
+  return next
+}
+
+const getPreviousWeekday = (date) => {
+  const prev = new Date(date)
+  do {
+    prev.setDate(prev.getDate() - 1)
+  } while (!isWeekday(prev))
+  return prev
+}
 
 const getNextUnlockDay = () => {
   const today = new Date()
@@ -189,42 +249,28 @@ const formatDate = (date) => {
 }
 
 const goToPreviousDay = () => {
-  if (weekdayIndex.value > 0) {
-    weekdayIndex.value--
-    updateCurrentDate()
+  if (canGoToPreviousDay.value) {
+    currentDate.value = getPreviousWeekday(currentDate.value)
     scrollToTop()
   }
 }
 
 const goToNextDay = () => {
   if (canGoToNextDay.value) {
-    weekdayIndex.value++
-    updateCurrentDate()
+    currentDate.value = getNextWeekday(currentDate.value)
     scrollToTop()
   }
 }
 
 const goToToday = () => {
-  weekdayIndex.value = getWeekdaysSinceStart() % totalArticles
   currentDate.value = new Date()
+  // If today is not a weekday, find the most recent weekday
+  if (!isWeekday(currentDate.value)) {
+    currentDate.value = getPreviousWeekday(currentDate.value)
+  }
   scrollToTop()
 }
 
-const updateCurrentDate = () => {
-  // Calculate the actual date for the current weekday index
-  let current = new Date(START_DATE)
-  let weekdaysCount = 0
-  
-  while (weekdaysCount < weekdayIndex.value) {
-    current.setDate(current.getDate() + 1)
-    const dayOfWeek = current.getDay()
-    if (dayOfWeek >= 1 && dayOfWeek <= 5) {
-      weekdaysCount++
-    }
-  }
-  
-  currentDate.value = current
-}
 
 // Scroll handling for header minimization
 const handleScroll = () => {
@@ -245,7 +291,6 @@ const handleResize = () => {
 }
 
 onMounted(() => {
-  updateCurrentDate()
   window.addEventListener('scroll', handleScroll)
   window.addEventListener('resize', handleResize)
   handleResize() // Initial check
