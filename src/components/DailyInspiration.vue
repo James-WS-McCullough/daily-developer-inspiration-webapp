@@ -1,5 +1,10 @@
 <template>
   <div class="daily-inspiration">
+    <!-- Toast notification -->
+    <div class="toast" :class="{ 'toast-show': showToast }">
+      📋 Copied to clipboard!
+    </div>
+    
     <header class="header" :class="{ 'header-minimized': isScrolled }">
       <div class="container">
         <h1 class="title">📚 Daily Developer Wisdom</h1>
@@ -8,29 +13,43 @@
           <span class="day-counter" v-if="isDeveloperMode">Day {{ currentDayNumber }} of {{ totalArticles }}</span>
         </div>
         
-        <!-- Navigation moved to header -->
-        <div class="header-navigation" v-if="hasArticlesAvailable">
-          <button 
-            @click="goToPreviousDay" 
-            :disabled="!canGoToPreviousDay"
-            class="nav-button prev"
-            title="Previous Day"
-          >
-            {{ previousButtonText }}
-          </button>
+        <!-- Combined navigation and actions bar -->
+        <div class="header-controls" v-if="hasArticlesAvailable">
+          <!-- Navigation buttons (left aligned) -->
+          <div class="header-navigation">
+            <button 
+              @click="goToPreviousDay" 
+              :disabled="!canGoToPreviousDay"
+              class="nav-button prev"
+              title="Previous Day"
+            >
+              {{ previousButtonText }}
+            </button>
+            
+            <button @click="goToToday" class="nav-button today" title="Today">
+              Today
+            </button>
+            
+            <button 
+              @click="goToNextDay" 
+              :disabled="!canGoToNextDay"
+              class="nav-button next"
+              :title="nextButtonTooltip"
+            >
+              {{ nextButtonText }}
+            </button>
+          </div>
           
-          <button @click="goToToday" class="nav-button today" title="Today">
-            Today
-          </button>
-          
-          <button 
-            @click="goToNextDay" 
-            :disabled="!canGoToNextDay"
-            class="nav-button next"
-            :title="nextButtonTooltip"
-          >
-            {{ nextButtonText }}
-          </button>
+          <!-- Share button (right aligned) -->
+          <div class="header-actions" v-if="currentArticle">
+            <button 
+              @click="shareArticle" 
+              class="share-button"
+              title="Share today's wisdom"
+            >
+              📤 Share
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -103,6 +122,7 @@ const totalArticles = articles.length
 const currentDate = ref(new Date())
 const isScrolled = ref(false)
 const isMobile = ref(false)
+const showToast = ref(false)
 
 // Helper function to check if a date is a weekday
 const isWeekday = (date) => {
@@ -154,11 +174,11 @@ const previousButtonText = computed(() => {
   } else {
     const prevDate = getPreviousWeekday(currentDate.value)
     const today = new Date()
-    const twoWeeksAgo = new Date(today)
-    twoWeeksAgo.setDate(today.getDate() - 14)
+    const oneWeekAgo = new Date(today)
+    oneWeekAgo.setDate(today.getDate() - 7)
     
-    // Check if we're at the 2-week limit or start date limit
-    if (prevDate < START_DATE || prevDate < twoWeeksAgo) {
+    // Check if we're at the 1-week limit or start date limit
+    if (prevDate < START_DATE || prevDate < oneWeekAgo) {
       return 'Too Old'
     }
     return 'Previous'
@@ -180,13 +200,13 @@ const canGoToPreviousDay = computed(() => {
   if (isDeveloperMode) {
     return currentDate.value > START_DATE
   } else {
-    // Can go back to previous weekday, but not before start date or more than 2 weeks back
+    // Can go back to previous weekday, but not before start date or more than 1 week back
     const prevDate = getPreviousWeekday(currentDate.value)
     const today = new Date()
-    const twoWeeksAgo = new Date(today)
-    twoWeeksAgo.setDate(today.getDate() - 14)
+    const oneWeekAgo = new Date(today)
+    oneWeekAgo.setDate(today.getDate() - 7)
     
-    return prevDate >= START_DATE && prevDate >= twoWeeksAgo
+    return prevDate >= START_DATE && prevDate >= oneWeekAgo
   }
 })
 
@@ -295,6 +315,67 @@ const goToToday = () => {
   scrollToTop()
 }
 
+// Share functionality
+const shareArticle = async () => {
+  if (!currentArticle.value) return
+  
+  const pageUrl = window.location.href
+  const today = new Date()
+  const isToday = currentDate.value.toDateString() === today.toDateString()
+  
+  let shareMessage
+  if (isToday) {
+    shareMessage = `Today's Daily Developer Wisdom: ${currentArticle.value.title} - ${pageUrl}`
+  } else {
+    shareMessage = `Daily Developer Wisdom - ${pageUrl}`
+  }
+  
+  try {
+    await navigator.clipboard.writeText(shareMessage)
+    showToastNotification()
+  } catch (err) {
+    console.error('Failed to copy to clipboard:', err)
+    // Fallback for older browsers
+    const success = fallbackCopyTextToClipboard(shareMessage)
+    if (success) {
+      showToastNotification()
+    }
+  }
+}
+
+// Show toast notification
+const showToastNotification = () => {
+  showToast.value = true
+  setTimeout(() => {
+    showToast.value = false
+  }, 3000) // Hide after 3 seconds
+}
+
+// Fallback copy function for older browsers
+const fallbackCopyTextToClipboard = (text) => {
+  const textArea = document.createElement('textarea')
+  textArea.value = text
+  
+  // Avoid scrolling to bottom
+  textArea.style.top = '0'
+  textArea.style.left = '0'
+  textArea.style.position = 'fixed'
+  
+  document.body.appendChild(textArea)
+  textArea.focus()
+  textArea.select()
+  
+  try {
+    const successful = document.execCommand('copy')
+    document.body.removeChild(textArea)
+    return successful
+  } catch (err) {
+    console.error('Fallback: Unable to copy to clipboard', err)
+    document.body.removeChild(textArea)
+    return false
+  }
+}
+
 
 // Scroll handling for header minimization
 const handleScroll = () => {
@@ -330,6 +411,30 @@ onUnmounted(() => {
 .daily-inspiration {
   min-height: 100vh;
   background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+  position: relative;
+}
+
+/* Toast notification styles */
+.toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: linear-gradient(135deg, #10b981, #34d399);
+  color: white;
+  padding: 0.75rem 1.5rem;
+  border-radius: 0.5rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+  transform: translateX(100%);
+  opacity: 0;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.toast-show {
+  transform: translateX(0);
+  opacity: 1;
 }
 
 .container {
@@ -381,11 +486,43 @@ onUnmounted(() => {
   margin-bottom: 1rem;
 }
 
+.header-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
 .header-navigation {
   display: flex;
-  justify-content: center;
   gap: 1rem;
   align-items: center;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+}
+
+.share-button {
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  border: none;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 4px rgba(139, 92, 246, 0.3);
+}
+
+.share-button:hover {
+  background: linear-gradient(135deg, #7c3aed, #db2777);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(139, 92, 246, 0.4);
 }
 
 .nav-button {
@@ -655,14 +792,37 @@ onUnmounted(() => {
     align-items: flex-start;
   }
   
+  .header-controls {
+    flex-direction: column;
+    gap: 0.75rem;
+    align-items: stretch;
+  }
+  
   .header-navigation {
-    margin-top: 0.5rem;
+    justify-content: center;
     gap: 0.5rem;
+  }
+  
+  .header-actions {
+    justify-content: center;
+  }
+  
+  .share-button {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
   }
   
   .nav-button {
     padding: 0.375rem 0.75rem;
     font-size: 0.75rem;
+  }
+  
+  .toast {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    font-size: 0.8rem;
+    padding: 0.6rem 1rem;
   }
   
   .no-articles-content {
