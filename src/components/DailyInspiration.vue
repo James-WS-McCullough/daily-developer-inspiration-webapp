@@ -96,7 +96,7 @@ import articlesData from '../data/articles.json'
 
 // Configuration
 const START_DATE = new Date('2025-09-01') // Articles start date //2025-09-01
-const isDeveloperMode =  import.meta.env.DEV // Enable developer features in development
+const isDeveloperMode = import.meta.env.DEV // Enable developer features in development
 
 const articles = articlesData.inspiration
 const totalArticles = articles.length
