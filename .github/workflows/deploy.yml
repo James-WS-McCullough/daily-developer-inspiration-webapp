@@ -26,9 +26,17 @@ jobs:
     - name: Build
       run: npm run build
 
+    - name: Verify build output
+      run: |
+        ls -la ./dist
+        echo "Build completed successfully"
+
     - name: Deploy to GitHub Pages
       uses: peaceiris/actions-gh-pages@v3
       if: github.ref == 'refs/heads/main'
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./dist
+        enable_jekyll: false
+        allow_empty_commit: false
+        force_orphan: true
