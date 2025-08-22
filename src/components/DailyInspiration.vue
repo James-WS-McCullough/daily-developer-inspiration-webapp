@@ -78,6 +78,10 @@
         <div class="no-articles" v-if="!hasArticlesAvailable">
           <div class="no-articles-content">
             <h2 class="no-articles-title">Coming Soon</h2>
+            <div class="countdown" v-if="daysUntilStart > 0">
+              <div class="countdown-number">{{ daysUntilStart }}</div>
+              <div class="countdown-label">{{ daysUntilStart === 1 ? 'day' : 'days' }} to go!</div>
+            </div>
             <p class="no-articles-message">
               Daily Developer Wisdom starts on 
               <strong>{{ formatDate(new Date(START_DATE)) }}</strong>
@@ -134,7 +138,7 @@ import articlesData from '../data/articles.json'
 
 // Configuration
 const START_DATE = new Date('2025-09-01') // Articles start date //2025-09-01
-const isDeveloperMode = import.meta.env.DEV // Enable developer features in development
+const isDeveloperMode = false// import.meta.env.DEV // Enable developer features in development
 
 const articles = articlesData.inspiration
 const totalArticles = articles.length
@@ -186,6 +190,29 @@ const currentArticle = computed(() => {
 const currentDayNumber = computed(() => {
   const articleIndex = getArticleIndexForDate(currentDate.value)
   return articleIndex !== null ? articleIndex + 1 : 0
+})
+
+const daysUntilStart = computed(() => {
+  if (hasArticlesAvailable.value) return 0
+  
+  const today = new Date()
+  const startDate = new Date(START_DATE)
+  
+  // Reset time to start of day for accurate day calculation
+  today.setHours(0, 0, 0, 0)
+  startDate.setHours(0, 0, 0, 0)
+  
+  const diffTime = startDate - today
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+  
+  return Math.max(0, diffDays)
+})
+
+const countdownText = computed(() => {
+  const days = daysUntilStart.value
+  if (days === 0) return ''
+  if (days === 1) return '1 day to go!'
+  return `${days} days to go!`
 })
 
 const previousButtonText = computed(() => {
@@ -731,6 +758,37 @@ onUnmounted(() => {
   font-style: italic;
 }
 
+.countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(52, 211, 153, 0.1));
+  border: 1px solid rgba(96, 165, 250, 0.3);
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.countdown-number {
+  font-size: 4rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #60a5fa, #34d399);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.countdown-label {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 /* Footer Styles */
 .footer {
   background: rgba(0, 0, 0, 0.3);
@@ -1021,6 +1079,19 @@ onUnmounted(() => {
   
   .no-articles-title {
     font-size: 2rem;
+  }
+  
+  .countdown {
+    margin: 1.5rem 0;
+    padding: 1rem;
+  }
+  
+  .countdown-number {
+    font-size: 3rem;
+  }
+  
+  .countdown-label {
+    font-size: 1rem;
   }
   
   .footer-content {
