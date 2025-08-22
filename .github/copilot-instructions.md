@@ -46,7 +46,7 @@
 	Clean up the copilot-instructions.md file in the .github directory by removing all HTML comments.
 	 -->
 
-## Daily Developer Inspiration Web App
+## Daily Developer Wisdom Web App
 
 This Vue.js application displays daily programming inspiration articles with markdown content in a clean, dark mode reading experience.
 

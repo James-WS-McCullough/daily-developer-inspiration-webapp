@@ -1,8 +1,11 @@
-# Daily Developer Inspiration
+# Daily Developer Wisdom
 
 A simple, elegant web application that delivers daily programming wisdom to inspire and educate developers. Each weekday, discover a new piece of expert advice to enhance your coding journey.
 
 ## 🎯 About
+
+This site was made as a test of the Github Agent Claude Sonnet 4.
+Bad coding practices beware!
 
 This site provides curated daily programming insights sourced from **"97 Things Every Programmer Should Know"** - a collection of wisdom from experienced software developers and industry experts. Each article offers practical advice, best practices, and thoughtful perspectives on software development.
 

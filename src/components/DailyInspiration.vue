@@ -2,7 +2,7 @@
   <div class="daily-inspiration">
     <header class="header" :class="{ 'header-minimized': isScrolled }">
       <div class="container">
-        <h1 class="title">Daily Developer Inspiration</h1>
+        <h1 class="title">📚 Daily Developer Wisdom</h1>
         <div class="date-info" v-show="!isScrolled || !isMobile">
           <span class="current-date">{{ formatDate(currentDate) }}</span>
           <span class="day-counter" v-if="isDeveloperMode">Day {{ weekdayIndex + 1 }} of {{ totalArticles }}</span>
@@ -42,7 +42,7 @@
           <div class="no-articles-content">
             <h2 class="no-articles-title">Coming Soon</h2>
             <p class="no-articles-message">
-              Daily Developer Inspiration starts on 
+              Daily Developer Wisdom starts on 
               <strong>{{ formatDate(new Date(START_DATE)) }}</strong>
             </p>
             <p class="no-articles-subtitle">
