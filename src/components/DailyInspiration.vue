@@ -124,6 +124,7 @@ const currentDate = ref(new Date())
 const isScrolled = ref(false)
 const isMobile = ref(false)
 const showToast = ref(false)
+const lastScrollY = ref(0)
 
 // Helper function to check if a date is a weekday
 const isWeekday = (date) => {
@@ -396,9 +397,27 @@ const fallbackCopyTextToClipboard = (text) => {
 }
 
 
-// Scroll handling for header minimization
+// Scroll handling for header minimization with hysteresis to prevent jittering
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 100
+  const currentScrollY = window.scrollY
+  
+  // Use different thresholds for scrolling down vs up to prevent jittery behavior
+  const SCROLL_DOWN_THRESHOLD = 110
+  const SCROLL_UP_THRESHOLD = 50
+  
+  if (currentScrollY > lastScrollY.value) {
+    // Scrolling down
+    if (currentScrollY > SCROLL_DOWN_THRESHOLD) {
+      isScrolled.value = true
+    }
+  } else {
+    // Scrolling up
+    if (currentScrollY < SCROLL_UP_THRESHOLD) {
+      isScrolled.value = false
+    }
+  }
+  
+  lastScrollY.value = currentScrollY
 }
 
 // Smooth scroll to top

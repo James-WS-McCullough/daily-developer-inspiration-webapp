@@ -23,7 +23,7 @@ This site provides curated daily programming insights sourced from **"97 Things 
 
 ## 🚀 Live Demo
 
-Visit the live application: [Daily Developer Inspiration](https://james-ws-mccullough.github.io/daily-developer-wisdom-webapp/)
+Visit the live application: [Daily Developer Wisdom](https://james-ws-mccullough.github.io/daily-developer-wisdom-webapp/)
 
 ## 🛠 Technology Stack
 
