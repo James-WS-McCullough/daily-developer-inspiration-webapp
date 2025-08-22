@@ -23,7 +23,7 @@ This site provides curated daily programming insights sourced from **"97 Things 
 
 ## 🚀 Live Demo
 
-Visit the live application: [Daily Developer Inspiration](https://james-ws-mccullough.github.io/daily-developer-inspiration-webapp/)
+Visit the live application: [Daily Developer Inspiration](https://james-ws-mccullough.github.io/daily-developer-wisdom-webapp/)
 
 ## 🛠 Technology Stack
 
@@ -43,8 +43,8 @@ Visit the live application: [Daily Developer Inspiration](https://james-ws-mccul
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/James-WS-McCullough/daily-developer-inspiration-webapp.git
-   cd daily-developer-inspiration-webapp
+   git clone https://github.com/James-WS-McCullough/daily-developer-wisdom-webapp.git
+   cd daily-developer-wisdom-webapp
    ```
 
 2. **Install dependencies**
