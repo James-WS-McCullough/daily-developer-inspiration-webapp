@@ -92,6 +92,21 @@
           </div>
         </div>
 
+        <!-- Weekend message -->
+        <div class="weekend-message" v-else-if="isWeekendAfterStart">
+          <div class="weekend-content">
+            <h2 class="weekend-title">📅 It's the Weekend!</h2>
+            <p class="weekend-text">
+              New articles are revealed on <strong>weekdays only</strong>. 
+              The next article will be available on 
+              <strong>{{ formatDate(nextWeekdayDate) }}</strong>.
+            </p>
+            <p class="weekend-subtitle">
+              In the meantime, you can browse the previous week's articles using the navigation buttons above!
+            </p>
+          </div>
+        </div>
+
         <!-- Article content -->
         <article class="article" v-else-if="currentArticle">
           <div class="article-header">
@@ -213,6 +228,25 @@ const countdownText = computed(() => {
   if (days === 0) return ''
   if (days === 1) return '1 day to go!'
   return `${days} days to go!`
+})
+
+const isWeekendAfterStart = computed(() => {
+  const viewingDate = currentDate.value
+  const startDate = new Date(START_DATE)
+  
+  // Check if the date being viewed is after start date and is a weekend
+  return viewingDate >= startDate && !isWeekday(viewingDate) && !isDeveloperMode
+})
+
+const nextWeekdayDate = computed(() => {
+  if (!isWeekendAfterStart.value) return null
+  
+  // Find the next weekday from the current viewing date
+  const nextWeekday = new Date(currentDate.value)
+  while (!isWeekday(nextWeekday)) {
+    nextWeekday.setDate(nextWeekday.getDate() + 1)
+  }
+  return nextWeekday
 })
 
 const previousButtonText = computed(() => {
@@ -789,6 +823,49 @@ onUnmounted(() => {
   letter-spacing: 0.05em;
 }
 
+/* Weekend Message Styles */
+.weekend-message {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+}
+
+.weekend-content {
+  text-align: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  max-width: 500px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(236, 72, 153, 0.05));
+  border-color: rgba(139, 92, 246, 0.2);
+}
+
+.weekend-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  background: linear-gradient(135deg, #8b5cf6, #ec4899);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+}
+
+.weekend-text {
+  font-size: 1.125rem;
+  color: #e5e7eb;
+  margin-bottom: 1rem;
+  line-height: 1.6;
+}
+
+.weekend-subtitle {
+  font-size: 1rem;
+  color: #9ca3af;
+  font-style: italic;
+}
+
 /* Footer Styles */
 .footer {
   background: rgba(0, 0, 0, 0.3);
@@ -1092,6 +1169,15 @@ onUnmounted(() => {
   
   .countdown-label {
     font-size: 1rem;
+  }
+  
+  .weekend-content {
+    padding: 2rem 1.5rem;
+    margin: 0 1rem;
+  }
+  
+  .weekend-title {
+    font-size: 2rem;
   }
   
   .footer-content {
