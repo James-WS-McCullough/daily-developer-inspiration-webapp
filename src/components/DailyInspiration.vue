@@ -361,7 +361,18 @@ const renderedContent = computed(() => {
     gfm: true,
   })
   
-  return marked(currentArticle.value.content)
+  // Preprocess content to handle custom superscript and subscript syntax
+  let processedContent = currentArticle.value.content
+  
+  // Handle superscript: e^^x^^ -> e<sup>x</sup>
+  // Use double carets to avoid conflicts with single caret usage
+  processedContent = processedContent.replace(/\^\^([^\^]+)\^\^/g, '<sup>$1</sup>')
+  
+  // Handle subscript: x,,1,, -> x<sub>1</sub>
+  // Use double commas for subscript to avoid conflicts
+  processedContent = processedContent.replace(/,,([^,]+),,/g, '<sub>$1</sub>')
+  
+  return marked(processedContent)
 })
 
 const estimatedReadingTime = computed(() => {
@@ -1004,6 +1015,20 @@ onUnmounted(() => {
 
 .article-content :deep(em) {
   color: #d1d5db;
+}
+
+.article-content :deep(sup) {
+  color: #60a5fa;
+  font-size: 0.75em;
+  vertical-align: super;
+  line-height: 0;
+}
+
+.article-content :deep(sub) {
+  color: #34d399;
+  font-size: 0.75em;
+  vertical-align: sub;
+  line-height: 0;
 }
 
 .article-content :deep(code) {
