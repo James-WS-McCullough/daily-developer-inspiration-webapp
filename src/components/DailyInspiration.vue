@@ -1031,6 +1031,95 @@ onUnmounted(() => {
   line-height: 0;
 }
 
+.article-content :deep(a) {
+  color: #60a5fa;
+  text-decoration: none;
+  border-bottom: 1px solid rgba(96, 165, 250, 0.3);
+  transition: all 0.2s ease;
+  font-weight: 500;
+}
+
+.article-content :deep(a:hover) {
+  color: #93c5fd;
+  border-bottom-color: rgba(147, 197, 253, 0.6);
+  background: rgba(96, 165, 250, 0.1);
+  padding: 0.125rem 0.25rem;
+  margin: -0.125rem -0.25rem;
+  border-radius: 0.25rem;
+}
+
+.article-content :deep(a:visited) {
+  color: #a78bfa;
+  border-bottom-color: rgba(167, 139, 250, 0.3);
+}
+
+.article-content :deep(a:visited:hover) {
+  color: #c4b5fd;
+  border-bottom-color: rgba(196, 181, 253, 0.6);
+  background: rgba(167, 139, 250, 0.1);
+}
+
+/* Table styles */
+.article-content :deep(table) {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 2rem 0;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2);
+}
+
+.article-content :deep(thead) {
+  background: linear-gradient(135deg, rgba(96, 165, 250, 0.1), rgba(52, 211, 153, 0.1));
+  border-bottom: 2px solid rgba(96, 165, 250, 0.3);
+}
+
+.article-content :deep(th) {
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #f9fafb;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.article-content :deep(th:last-child) {
+  border-right: none;
+}
+
+.article-content :deep(td) {
+  padding: 0.875rem 1rem;
+  color: #e5e7eb;
+  border-right: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.article-content :deep(td:last-child) {
+  border-right: none;
+}
+
+.article-content :deep(tbody tr:last-child td) {
+  border-bottom: none;
+}
+
+.article-content :deep(tbody tr:hover) {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.article-content :deep(tbody tr:nth-child(even)) {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.article-content :deep(tbody tr:nth-child(even):hover) {
+  background: rgba(255, 255, 255, 0.04);
+}
+
 .article-content :deep(code) {
   background: rgba(255, 255, 255, 0.1);
   padding: 0.125rem 0.375rem;
@@ -1116,6 +1205,42 @@ onUnmounted(() => {
   .article-content :deep(code) {
     font-size: 0.85em;
     padding: 0.1rem 0.3rem;
+  }
+  
+  .article-content :deep(a:hover) {
+    padding: 0.1rem 0.2rem;
+    margin: -0.1rem -0.2rem;
+  }
+  
+  /* Mobile table styles */
+  .article-content :deep(table) {
+    font-size: 0.8rem;
+    margin: 1.5rem 0;
+  }
+  
+  .article-content :deep(th) {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  
+  .article-content :deep(td) {
+    padding: 0.6rem 0.5rem;
+    font-size: 0.8rem;
+  }
+  
+  /* Enable horizontal scrolling for wide tables on mobile */
+  .article-content :deep(table) {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  .article-content :deep(thead),
+  .article-content :deep(tbody),
+  .article-content :deep(tr) {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
   }
   
   .date-info {
