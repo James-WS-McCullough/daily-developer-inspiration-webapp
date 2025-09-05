@@ -999,6 +999,11 @@ onUnmounted(() => {
   padding-left: 2rem;
 }
 
+.article-content :deep(ol) {
+  margin: 2rem 0;
+  padding-left: 2rem;
+}
+
 .article-content :deep(li) {
   margin-bottom: 1rem;
   line-height: 1.8;
